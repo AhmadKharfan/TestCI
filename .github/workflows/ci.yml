@@ -17,9 +17,6 @@ jobs:
     name: Run Tests and Generate Coverage
     runs-on: ubuntu-latest
 
-    outputs:
-      report-path: ${{ steps.set-output.outputs.report-path }}
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -40,9 +37,18 @@ jobs:
       - name: Verify coverage thresholds (≥ 80%)
         run: ./gradlew koverVerify
 
-      - name: Set output for coverage path
-        id: set-output
-        run: echo "report-path=build/reports/kover/html/" >> $GITHUB_OUTPUT
+      - name: Debug test result files
+        if: always()
+        run: |
+          echo "Checking if test results exist..."
+          ls -l build/test-results/test || echo "Directory not found"
+
+      - name: Upload test results (JUnit XML)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: build/test-results/test/TEST-*.xml
 
       - name: Upload Kover HTML report
         if: always()
@@ -76,14 +82,11 @@ jobs:
     if: always()
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Download HTML report
+      - name: Download Kover HTML report
         uses: actions/download-artifact@v4
         with:
           name: kover-html-report
           path: build/reports/kover/html/
 
-      - name: Show that report was uploaded
-        run: echo "Kover HTML report is available as artifact."
+      - name: Confirm HTML report upload
+        run: echo "✅ Kover HTML report is available as artifact."
