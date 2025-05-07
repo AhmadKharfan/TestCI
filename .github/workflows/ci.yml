@@ -90,3 +90,4 @@ jobs:
 
       - name: Confirm HTML report upload
         run: echo "Kover HTML report is available as artifact."
+
