@@ -44,13 +44,6 @@ jobs:
         id: set-output
         run: echo "report-path=build/reports/kover/html/" >> $GITHUB_OUTPUT
 
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: test-results
-          path: build/test-results/test/TEST-*.xml
-
       - name: Upload Kover HTML report
         if: always()
         uses: actions/upload-artifact@v4
@@ -62,17 +55,11 @@ jobs:
     name: Comment on PR with Test Results
     needs: run-tests
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'pull_request' }}
+    if: ${{ always() && github.event_name == 'pull_request' }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Download test results
-        uses: actions/download-artifact@v4
-        with:
-          name: test-results
-          path: build/test-results/test/
 
       - name: Publish Unit Test Results as PR comment
         uses: EnricoMi/publish-unit-test-result-action@v2
