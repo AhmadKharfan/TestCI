@@ -44,13 +44,22 @@ jobs:
           name: coverage-html-report
           path: build/reports/kover/html/
 
-      - name: Generate Kover XML Report
-        run: ./gradlew koverXmlReport
+#      - name: Generate Kover XML Report
+#        run: ./gradlew koverXmlReport
+#
+#      # يمكنك تركها أو حذفها إن لم تعد تستخدم Codecov
+#      - name: Upload coverage to Codecov
+#        uses: codecov/codecov-action@v4
+#        with:
+#          files: build/reports/kover/report.xml
+#          flags: kover
+#          name: kover-coverage
+#          token: ${{ secrets.CODECOV_TOKEN }}
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v4
+      # ✅ عرض نتيجة اختبار JUnit XML على PR
+      - name: Publish Test Summary to PR
+        uses: test-summary/action@v2
         with:
-          files: build/reports/kover/report.xml
-          flags: kover
-          name: kover-coverage
-          token: ${{ secrets.CODECOV_TOKEN }}
+          paths: build/test-results/test/TEST-*.xml
+          comment: true
+          show: always
