@@ -14,8 +14,11 @@ permissions:
 
 jobs:
   run-tests:
-    name: Run Tests with Kover
+    name: Run Tests and Generate Coverage
     runs-on: ubuntu-latest
+
+    outputs:
+      report-path: ${{ steps.set-output.outputs.report-path }}
 
     steps:
       - name: Checkout
@@ -37,6 +40,17 @@ jobs:
       - name: Verify coverage thresholds (≥ 80%)
         run: ./gradlew koverVerify
 
+      - name: Set output for coverage path
+        id: set-output
+        run: echo "report-path=build/reports/kover/html/" >> $GITHUB_OUTPUT
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: build/test-results/test/TEST-*.xml
+
       - name: Upload Kover HTML report
         if: always()
         uses: actions/upload-artifact@v4
@@ -44,8 +58,42 @@ jobs:
           name: kover-html-report
           path: build/reports/kover/html/
 
+  publish-test-results:
+    name: Comment on PR with Test Results
+    needs: run-tests
+    runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'pull_request' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download test results
+        uses: actions/download-artifact@v4
+        with:
+          name: test-results
+          path: build/test-results/test/
+
       - name: Publish Unit Test Results as PR comment
-        if: always()
         uses: EnricoMi/publish-unit-test-result-action@v2
         with:
           files: build/test-results/test/TEST-*.xml
+
+  upload-coverage-html:
+    name: Upload HTML Coverage Report (Separate Job)
+    needs: run-tests
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download HTML report
+        uses: actions/download-artifact@v4
+        with:
+          name: kover-html-report
+          path: build/reports/kover/html/
+
+      - name: Show that report was uploaded
+        run: echo "Kover HTML report is available as artifact."
