@@ -2,11 +2,6 @@ plugins {
     kotlin("jvm") version "2.1.10"
     id("org.jetbrains.kotlinx.kover") version "0.9.1"
     kotlin("plugin.serialization") version "1.8.20"
-    jacoco
-}
-
-jacoco {
-    toolVersion = "0.8.10"
 }
 
 group = "com.berlin"
@@ -69,14 +64,6 @@ repositories {
 
 tasks.named("check") {
     dependsOn(tasks.koverVerify)
-}
-
-tasks.jacocoTestReport {
-    dependsOn(tasks.test)
-    reports {
-        xml.required.set(true)
-        html.required.set(true)
-    }
 }
 
 tasks.test {

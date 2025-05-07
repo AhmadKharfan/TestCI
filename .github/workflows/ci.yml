@@ -1,4 +1,4 @@
-name: CI with Kover
+name: CI with Kover & PR Comment
 
 on:
   push:
@@ -13,7 +13,7 @@ permissions:
 
 jobs:
   run-tests:
-    name: Execute Tests & Coverage
+    name: Run Tests with Kover
     runs-on: ubuntu-latest
 
     steps:
@@ -30,33 +30,23 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Run Tests with JaCoCo
-        run: ./gradlew test jacocoTestReport
+      - name: Run tests
+        run: ./gradlew test koverHtmlReport koverXmlReport
 
-      - name: Generate Kover HTML Report
-        run: ./gradlew koverHtmlReport
-
-      - name: Upload HTML coverage report
+      - name: Upload Kover HTML coverage report
         uses: actions/upload-artifact@v4
         with:
-          name: coverage-html-report
+          name: kover-html-report
           path: build/reports/kover/html/
 
-      # ✅ نشر تقرير التغطية وكتابة تعليق تلقائي
-      - name: Generate JaCoCo coverage summary and comment
-        uses: madrapps/jacoco-report@v1.6.1
+      - name: Upload Kover XML report (optional)
+        uses: actions/upload-artifact@v4
         with:
-          paths: build/reports/jacoco/test/jacocoTestReport.xml
-          token: ${{ secrets.GITHUB_TOKEN }}
-          title: '📊 Code Coverage Report'
-          update-comment: true
+          name: kover-xml-report
+          path: build/reports/kover/report.xml
 
-      # ✅ عرض نتائج الاختبارات من XML
-      - name: Publish Test Results
-        uses: dorny/test-reporter@v1
+      - name: Publish Unit Test Results as PR comment
+        uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
-          name: Unit Tests
-          path: build/test-results/test/TEST-*.xml
-          reporter: java-junit
-          token: ${{ secrets.GITHUB_TOKEN }}
+          files: build/test-results/test/TEST-*.xml
