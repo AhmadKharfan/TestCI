@@ -31,10 +31,13 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Run tests
-        run: ./gradlew test koverHtmlReport koverXmlReport
+      - name: Run tests and generate Kover reports
+        run: ./gradlew test koverHtmlReport
 
-      - name: Upload Kover HTML coverage report
+      - name: Verify coverage thresholds (≥ 80%)
+        run: ./gradlew koverVerify
+
+      - name: Upload Kover HTML report
         if: always()
         uses: actions/upload-artifact@v4
         with:
