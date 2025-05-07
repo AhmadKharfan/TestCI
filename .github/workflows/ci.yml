@@ -89,4 +89,5 @@ jobs:
           path: build/reports/kover/html/
 
       - name: Confirm HTML report upload
-        run: echo "✅ Kover HTML report is available as artifact."
+        run: echo "Kover HTML report is available as artifact."
+
