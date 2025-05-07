@@ -9,4 +9,8 @@ class TestClass {
         println(y*x)
     }
 
+    fun hello() {
+        println("hello")
+    }
+
 }
