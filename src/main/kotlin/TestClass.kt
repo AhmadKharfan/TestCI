@@ -8,4 +8,21 @@ class TestClass {
         val y = x * 10
         println(y*x)
     }
+
+
+    fun hello2() {
+        println("hello")
+    }
+
+    fun hello3() {
+        println("hello")
+    }
+
+    fun hello4() {
+        println("hello")
+    }
+
+    fun hello() {
+        println("hello")
+    }
 }
